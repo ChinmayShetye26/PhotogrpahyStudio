@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analytics - Photography Studio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        /* Reports Specific Styles */
+        .reports-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .reports-header h2 {
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .date-range-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .date-range-selector label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        
+        .date-range-selector input {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .report-header h3 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .report-content {
+            min-height: 200px;
+            position: relative;
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+            margin-top: 20px;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .trend-up {
+            color: #4CAF50;
+        }
+        
+        .trend-down {
+            color: #F44336;
+        }
+        
+        /* Data Tables in Reports */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .data-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #4a5568;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Report Tabs */
+        .report-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .report-tab {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4a5568;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .report-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        /* Full Report Sections */
+        .full-report {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+        
+        .full-report.active {
+            display: block;
+        }
+        
+        .report-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        /* Export Options */
+        .export-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: flex-end;
+        }
+        
+        .export-btn {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .export-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+        
+        .kpi-card.revenue::before {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .kpi-card.clients::before {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        }
+        
+        .kpi-card.sessions::before {
+            background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%);
+        }
+        
+        .kpi-card.products::before {
+            background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
+        }
+        
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .kpi-label {
+            font-size: 14px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .kpi-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        /* Loading States */
+        .report-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+        }
+        
+        .report-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .reports-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .date-range-selector {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-filters {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-camera-retro"></i>
+                <h1>StudioPro</h1>
+                <p>Management System</p>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="clients.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Clients</span>
+                </a>
+                <a href="sessions.html" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Sessions</span>
+                </a>
+                <a href="invoices.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Invoices</span>
+                </a>
+                <a href="staff.html" class="nav-item">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Staff</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="reports.html" class="nav-item active">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-info">
+                    <h4>Studio Manager</h4>
+                    <p>Administrator</p>
+                </div>
+                <button class="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="reports-header">
+                <h2><i class="fas fa-chart-bar"></i> Reports & Analytics</h2>
+                <div class="date-range-selector">
+                    <label>Date Range:</label>
+                    <input type="date" id="startDate" value="2024-01-01">
+                    <span>to</span>
+                    <input type="date" id="endDate" value="2024-12-31">
+                    <button class="btn btn-primary" onclick="loadAllReports()">
+                        <i class="fas fa-sync-alt"></i> Update
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card revenue">
+                    <div class="kpi-value" id="totalRevenueKPI">$0</div>
+                    <div class="kpi-label">Total Revenue</div>
+                    <div class="kpi-change trend-up">
+                        <i class="fas fa-arrow-up"></i> 12% from last period
+                    </div>
+                </div>
+                <div class="kpi-card clients">
+                    <div class="kpi-value" id="totalClientsKPI">0</div>
+                    <div class="kpi-label">Total Clients</div>
+                    <div class="kpi-change trend-up">
+                        <i class="fas fa-arrow-up"></i> 8% from last period
+                    </div>
+                </div>
+                <div class="kpi-card sessions">
+                    <div class="kpi-value" id="totalSessionsKPI">0</div>
+                    <div class="kpi-label">Total Sessions</div>
+                    <div class="kpi-change trend-up">
+                        <i class="fas fa-arrow-up"></i> 15% from last period
+                    </div>
+                </div>
+                <div class="kpi-card products">
+                    <div class="kpi-value" id="productsSoldKPI">0</div>
+                    <div class="kpi-label">Products Sold</div>
+                    <div class="kpi-change trend-up">
+                        <i class="fas fa-arrow-up"></i> 10% from last period
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Tabs -->
+            <div class="report-tabs">
+                <button class="report-tab active" onclick="showReport('overview')">
+                    <i class="fas fa-chart-pie"></i> Overview
+                </button>
+                <button class="report-tab" onclick="showReport('financial')">
+                    <i class="fas fa-dollar-sign"></i> Financial
+                </button>
+                <button class="report-tab" onclick="showReport('clients')">
+                    <i class="fas fa-users"></i> Clients
+                </button>
+                <button class="report-tab" onclick="showReport('sessions')">
+                    <i class="fas fa-calendar-alt"></i> Sessions
+                </button>
+                <button class="report-tab" onclick="showReport('marketing')">
+                    <i class="fas fa-bullhorn"></i> Marketing
+                </button>
+            </div>
+
+            <!-- Overview Report -->
+            <div id="overviewReport" class="full-report active">
+                <div class="report-header">
+                    <h3><i class="fas fa-chart-pie"></i> Business Overview</h3>
+                    <div class="export-options">
+                        <button class="export-btn" onclick="exportReport('overview')">
+                            <i class="fas fa-file-export"></i> Export
+                        </button>
+                        <button class="export-btn" onclick="printReport('overview')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <div class="report-header">
+                            <h3><i class="fas fa-chart-line"></i> Revenue Trend</h3>
+                        </div>
+                        <div class="report-content">
+                            <div class="chart-container">
+                                <canvas id="revenueTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-card">
+                        <div class="report-header">
+                            <h3><i class="fas fa-calendar-check"></i> Session Types</h3>
+                        </div>
+                        <div class="report-content">
+                            <div class="chart-container">
+                                <canvas id="sessionTypesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-card">
+                        <div class="report-header">
+                            <h3><i class="fas fa-user-plus"></i> Client Acquisition</h3>
+                        </div>
+                        <div class="report-content">
+                            <div class="chart-container">
+                                <canvas id="clientAcquisitionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-card">
+                        <div class="report-header">
+                            <h3><i class="fas fa-box"></i> Top Products</h3>
+                        </div>
+                        <div class="report-content">
+                            <div class="chart-container">
+                                <canvas id="topProductsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Report -->
+            <div id="financialReport" class="full-report">
+                <div class="report-header">
+                    <h3><i class="fas fa-dollar-sign"></i> Financial Report</h3>
+                    <div class="export-options">
+                        <button class="export-btn" onclick="exportReport('financial')">
+                            <i class="fas fa-file-export"></i> Export
+                        </button>
+                        <button class="export-btn" onclick="printReport('financial')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="report-filters">
+                    <div class="filter-group">
+                        <label>Report Type</label>
+                        <select id="financialReportType" onchange="loadFinancialReport()">
+                            <option value="revenue">Revenue Analysis</option>
+                            <option value="expenses">Expenses</option>
+                            <option value="profit">Profit Margin</option>
+                            <option value="invoices">Invoice Status</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Group By</label>
+                        <select id="financialGroupBy" onchange="loadFinancialReport()">
+                            <option value="month">Month</option>
+                            <option value="quarter">Quarter</option>
+                            <option value="year">Year</option>
+                            <option value="category">Category</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="report-content">
+                    <div class="chart-container">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+                    
+                    <div class="metric-grid" id="financialMetrics">
+                        <!-- Financial metrics will be loaded here -->
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4>Detailed Financial Data</h4>
+                        <div class="table-container">
+                            <table class="data-table" id="financialTable">
+                                <thead>
+                                    <tr>
+                                        <th>Period</th>
+                                        <th>Revenue</th>
+                                        <th>Expenses</th>
+                                        <th>Profit</th>
+                                        <th>Margin</th>
+                                        <th>Growth</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="financialTableBody">
+                                    <!-- Data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clients Report -->
+            <div id="clientsReport" class="full-report">
+                <div class="report-header">
+                    <h3><i class="fas fa-users"></i> Clients Report</h3>
+                    <div class="export-options">
+                        <button class="export-btn" onclick="exportReport('clients')">
+                            <i class="fas fa-file-export"></i> Export
+                        </button>
+                        <button class="export-btn" onclick="printReport('clients')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="report-content">
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <div class="report-header">
+                                <h3><i class="fas fa-chart-pie"></i> Client Demographics</h3>
+                            </div>
+                            <div class="report-content">
+                                <div class="chart-container">
+                                    <canvas id="clientDemographicsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="report-card">
+                            <div class="report-header">
+                                <h3><i class="fas fa-chart-line"></i> Client Growth</h3>
+                            </div>
+                            <div class="report-content">
+                                <div class="chart-container">
+                                    <canvas id="clientGrowthChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4>Top Clients by Lifetime Value</h4>
+                        <div class="table-container">
+                            <table class="data-table" id="topClientsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Client</th>
+                                        <th>Sessions</th>
+                                        <th>Total Spent</th>
+                                        <th>Last Session</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="topClientsTableBody">
+                                    <!-- Data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sessions Report -->
+            <div id="sessionsReport" class="full-report">
+                <div class="report-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Sessions Report</h3>
+                    <div class="export-options">
+                        <button class="export-btn" onclick="exportReport('sessions')">
+                            <i class="fas fa-file-export"></i> Export
+                        </button>
+                        <button class="export-btn" onclick="printReport('sessions')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="report-content">
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <div class="report-header">
+                                <h3><i class="fas fa-chart-bar"></i> Session Volume</h3>
+                            </div>
+                            <div class="report-content">
+                                <div class="chart-container">
+                                    <canvas id="sessionVolumeChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="report-card">
+                            <div class="report-header">
+                                <h3><i class="fas fa-chart-pie"></i> Session Distribution</h3>
+                            </div>
+                            <div class="report-content">
+                                <div class="chart-container">
+                                    <canvas id="sessionDistributionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4>Session Performance</h4>
+                        <div class="table-container">
+                            <table class="data-table" id="sessionsPerformanceTable">
+                                <thead>
+                                    <tr>
+                                        <th>Session Type</th>
+                                        <th>Count</th>
+                                        <th>Average Fee</th>
+                                        <th>Total Revenue</th>
+                                        <th>Popularity</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sessionsPerformanceTableBody">
+                                    <!-- Data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketing Report -->
+            <div id="marketingReport" class="full-report">
+                <div class="report-header">
+                    <h3><i class="fas fa-bullhorn"></i> Marketing Report</h3>
+                    <div class="export-options">
+                        <button class="export-btn" onclick="exportReport('marketing')">
+                            <i class="fas fa-file-export"></i> Export
+                        </button>
+                        <button class="export-btn" onclick="printReport('marketing')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="report-content">
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <div class="report-header">
+                                <h3><i class="fas fa-chart-bar"></i> Lead Sources</h3>
+                            </div>
+                            <div class="report-content">
+                                <div class="chart-container">
+                                    <canvas id="leadSourcesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="report-card">
+                            <div class="report-header">
+                                <h3><i class="fas fa-chart-line"></i> Conversion Rates</h3>
+                            </div>
+                            <div class="report-content">
+                                <div class="chart-container">
+                                    <canvas id="conversionRatesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4>Marketing Campaign Performance</h4>
+                        <div class="table-container">
+                            <table class="data-table" id="marketingPerformanceTable">
+                                <thead>
+                                    <tr>
+                                        <th>Campaign/Source</th>
+                                        <th>Leads</th>
+                                        <th>Conversions</th>
+                                        <th>Conversion Rate</th>
+                                        <th>Revenue Generated</th>
+                                        <th>ROI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marketingPerformanceTableBody">
+                                    <!-- Data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="js/main.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

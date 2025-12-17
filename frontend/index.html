@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Photography Studio Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-camera-retro"></i>
+                <h1>StudioPro</h1>
+                <p>Management System</p>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="index.html" class="nav-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="clients.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Clients</span>
+                </a>
+                <a href="sessions.html" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Sessions</span>
+                </a>
+                <a href="invoices.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Invoices</span>
+                </a>
+                <a href="staff.html" class="nav-item">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Staff</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-info">
+                    <h4>Studio Manager</h4>
+                    <p>Administrator</p>
+                </div>
+                <button class="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-left">
+                    <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                    <p class="welcome-msg">Welcome to Photography Studio Management System</p>
+                </div>
+                <div class="header-right">
+                    <div class="date-time">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentDateTime">Loading...</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stat-card clients">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalClients">0</h3>
+                        <p>Total Clients</p>
+                    </div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up"></i> 12%
+                    </div>
+                </div>
+                
+                <div class="stat-card sessions">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="upcomingSessions">0</h3>
+                        <p>Upcoming Sessions</p>
+                    </div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up"></i> 8%
+                    </div>
+                </div>
+                
+                <div class="stat-card revenue">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="monthlyRevenue">$0</h3>
+                        <p>Monthly Revenue</p>
+                    </div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up"></i> 15%
+                    </div>
+                </div>
+                
+                <div class="stat-card balance">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="outstandingBalance">$0</h3>
+                        <p>Outstanding Balance</p>
+                    </div>
+                    <div class="stat-trend warning">
+                        <i class="fas fa-exclamation-triangle"></i> Needs attention
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities Section -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-history"></i> Recent Activities</h3>
+                    <button class="btn btn-sm" onclick="viewAllActivities()">View All</button>
+                </div>
+                
+                <div class="activities-grid">
+                    <!-- Recent Sessions -->
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <h4><i class="fas fa-calendar-day"></i> Recent Sessions</h4>
+                            <span class="badge" id="recentSessionsCount">0</span>
+                        </div>
+                        <div class="activity-list" id="recentSessionsList">
+                            <div class="loading">Loading sessions...</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Invoices -->
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <h4><i class="fas fa-file-invoice"></i> Recent Invoices</h4>
+                            <span class="badge" id="recentInvoicesCount">0</span>
+                        </div>
+                        <div class="activity-list" id="recentInvoicesList">
+                            <div class="loading">Loading invoices...</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="activity-card quick-actions">
+                        <div class="activity-header">
+                            <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="location.href='clients.html'">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Add New Client</span>
+                            </button>
+                            <button class="action-btn" onclick="location.href='sessions.html'">
+                                <i class="fas fa-calendar-plus"></i>
+                                <span>Book Session</span>
+                            </button>
+                            <button class="action-btn" onclick="location.href='invoices.html'">
+                                <i class="fas fa-file-invoice"></i>
+                                <span>Create Invoice</span>
+                            </button>
+                            <button class="action-btn" onclick="location.href='products.html'">
+                                <i class="fas fa-box"></i>
+                                <span>Check Inventory</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-chart-line"></i> Performance Overview</h3>
+                    <select id="chartPeriod" onchange="updateCharts()">
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h5>Revenue Trend</h5>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h5>Session Types</h5>
+                        <div class="chart-container">
+                            <canvas id="sessionsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

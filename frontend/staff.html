@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Management - Photography Studio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Staff Specific Styles */
+        .staff-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .staff-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .staff-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .staff-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 600;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .staff-info h3 {
+            margin: 0 0 5px 0;
+            color: #2d3748;
+            font-size: 20px;
+        }
+        
+        .staff-role {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .staff-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        
+        .detail-item i {
+            color: #667eea;
+            width: 16px;
+        }
+        
+        .staff-performance {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+        
+        .stat-item h4 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            color: #2d3748;
+        }
+        
+        .stat-item p {
+            margin: 0;
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        /* Role Colors */
+        .role-lead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .role-second {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+        }
+        
+        .role-editor {
+            background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
+            color: white;
+        }
+        
+        .role-manager {
+            background: linear-gradient(135deg, #F44336 0%, #FF5252 100%);
+            color: white;
+        }
+        
+        .role-customer {
+            background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%);
+            color: white;
+        }
+        
+        /* Staff Modal */
+        .staff-modal .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .salary-input {
+            position: relative;
+        }
+        
+        .salary-input::before {
+            content: '$';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .salary-input input {
+            padding-left: 25px;
+        }
+        
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .role-option {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .role-option:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .role-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .role-option i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #667eea;
+        }
+        
+        /* Schedule View */
+        .schedule-view {
+            display: none;
+            margin-bottom: 30px;
+        }
+        
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .schedule-navigation {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 120px repeat(7, 1fr);
+            gap: 1px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .schedule-cell {
+            background: white;
+            padding: 15px;
+            min-height: 100px;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .schedule-header-cell {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .time-slot {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .schedule-session {
+            font-size: 11px;
+            padding: 5px 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            background: #e3f2fd;
+            color: #1976d2;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        /* Workload Stats */
+        .workload-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .workload-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .workload-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .workload-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .workload-label {
+            font-size: 14px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-camera-retro"></i>
+                <h1>StudioPro</h1>
+                <p>Management System</p>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="clients.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Clients</span>
+                </a>
+                <a href="sessions.html" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Sessions</span>
+                </a>
+                <a href="invoices.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Invoices</span>
+                </a>
+                <a href="staff.html" class="nav-item active">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Staff</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-info">
+                    <h4>Studio Manager</h4>
+                    <p>Administrator</p>
+                </div>
+                <button class="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2><i class="fas fa-user-tie"></i> Staff Management</h2>
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search staff...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddStaffModal()">
+                        <i class="fas fa-user-plus"></i> Add Staff Member
+                    </button>
+                </div>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="view-toggle" style="margin-bottom: 20px;">
+                <button class="view-btn active" onclick="switchView('grid')">
+                    <i class="fas fa-th-large"></i> Grid View
+                </button>
+                <button class="view-btn" onclick="switchView('table')">
+                    <i class="fas fa-list"></i> Table View
+                </button>
+                <button class="view-btn" onclick="switchView('schedule')">
+                    <i class="fas fa-calendar-alt"></i> Schedule
+                </button>
+            </div>
+
+            <!-- Workload Stats -->
+            <div class="workload-stats" id="workloadStats">
+                <div class="workload-card">
+                    <div class="workload-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="workload-value" id="totalStaff">0</div>
+                    <div class="workload-label">Total Staff</div>
+                </div>
+                <div class="workload-card">
+                    <div class="workload-icon" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="workload-value" id="activeSessions">0</div>
+                    <div class="workload-label">Active Sessions</div>
+                </div>
+                <div class="workload-card">
+                    <div class="workload-icon" style="background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="workload-value" id="avgWorkload">0</div>
+                    <div class="workload-label">Avg. Workload</div>
+                </div>
+                <div class="workload-card">
+                    <div class="workload-icon" style="background: linear-gradient(135deg, #F44336 0%, #FF5252 100%);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="workload-value" id="overloaded">0</div>
+                    <div class="workload-label">Overloaded</div>
+                </div>
+            </div>
+
+            <!-- Grid View -->
+            <div id="gridView" class="staff-grid">
+                <!-- Staff cards will be loaded here -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading staff...</p>
+                </div>
+            </div>
+
+            <!-- Table View -->
+            <div id="tableView" class="clients-container" style="display: none;">
+                <div class="table-container">
+                    <table class="clients-table">
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Role</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Hire Date</th>
+                                <th>Rate</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staffTableBody">
+                            <!-- Table rows will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn" onclick="changePage(-1, 'table')" disabled id="prevBtnTable">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="page-info" id="pageInfoTable">Page 1 of 1</span>
+                    <button class="page-btn" onclick="changePage(1, 'table')" disabled id="nextBtnTable">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Schedule View -->
+            <div id="scheduleView" class="schedule-view">
+                <div class="schedule-header">
+                    <div class="schedule-navigation">
+                        <button class="btn btn-secondary" onclick="changeScheduleWeek(-1)">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <button class="btn btn-secondary" onclick="changeScheduleWeek(0)">
+                            This Week
+                        </button>
+                        <button class="btn btn-secondary" onclick="changeScheduleWeek(1)">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="calendar-title" id="scheduleTitle">
+                        Week of January 1, 2024
+                    </div>
+                    <select id="scheduleStaff" onchange="renderSchedule()">
+                        <option value="all">All Staff</option>
+                        <!-- Staff options will be loaded here -->
+                    </select>
+                </div>
+                
+                <div class="schedule-grid" id="scheduleGrid">
+                    <!-- Schedule will be rendered here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Staff Modal -->
+    <div id="staffModal" class="modal">
+        <div class="modal-content staff-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> <span id="staffModalTitle">Add Staff Member</span></h3>
+                <button class="modal-close" onclick="closeStaffModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="staffForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="staffFirstName">First Name *</label>
+                            <input type="text" id="staffFirstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="staffLastName">Last Name *</label>
+                            <input type="text" id="staffLastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="staffEmail">Email Address *</label>
+                        <input type="email" id="staffEmail" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="staffPhone">Phone Number</label>
+                            <input type="tel" id="staffPhone">
+                        </div>
+                        <div class="form-group">
+                            <label for="staffHireDate">Hire Date *</label>
+                            <input type="date" id="staffHireDate" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Role *</label>
+                        <div class="role-selector" id="roleSelector">
+                            <div class="role-option" onclick="selectRole(this, 'Lead Photographer')">
+                                <i class="fas fa-camera"></i>
+                                <span>Lead Photographer</span>
+                            </div>
+                            <div class="role-option" onclick="selectRole(this, 'Second Photographer')">
+                                <i class="fas fa-user-friends"></i>
+                                <span>Second Photographer</span>
+                            </div>
+                            <div class="role-option" onclick="selectRole(this, 'Editor')">
+                                <i class="fas fa-edit"></i>
+                                <span>Editor</span>
+                            </div>
+                            <div class="role-option" onclick="selectRole(this, 'Studio Manager')">
+                                <i class="fas fa-user-tie"></i>
+                                <span>Studio Manager</span>
+                            </div>
+                            <div class="role-option" onclick="selectRole(this, 'Customer Success')">
+                                <i class="fas fa-headset"></i>
+                                <span>Customer Success</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="staffRole" required>
+                    </div>
+                    
+                    <div class="form-group salary-input">
+                        <label for="staffPayRate">Pay Rate ($/hr or per event) *</label>
+                        <input type="number" id="staffPayRate" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="staffStreet">Street Address</label>
+                        <input type="text" id="staffStreet">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="staffCity">City</label>
+                            <input type="text" id="staffCity">
+                        </div>
+                        <div class="form-group">
+                            <label for="staffState">State</label>
+                            <input type="text" id="staffState" maxlength="2" placeholder="e.g., NY">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="staffZip">ZIP Code</label>
+                            <input type="text" id="staffZip">
+                        </div>
+                        <div class="form-group">
+                            <label for="staffStatus">Status</label>
+                            <select id="staffStatus">
+                                <option value="active" selected>Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="on-leave">On Leave</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="staffId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeStaffModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveStaff()">
+                    <i class="fas fa-save"></i> Save Staff
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Details Modal -->
+    <div id="staffDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-circle"></i> Staff Details</h3>
+                <button class="modal-close" onclick="closeStaffDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="staffDetailsContent">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeStaffDetailsModal()">Close</button>
+                <button class="btn btn-primary" onclick="editStaffFromDetails()">
+                    <i class="fas fa-edit"></i> Edit Staff
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="js/staff.js"></script>
+</body>
+</html>
