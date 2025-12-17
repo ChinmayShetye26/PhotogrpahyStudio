@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Management - Photography Studio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .page-header h2 {
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-container i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        .clients-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .clients-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+        
+        .clients-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .clients-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #4a5568;
+        }
+        
+        .clients-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .client-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .client-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .client-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 3px;
+        }
+        
+        .client-email {
+            font-size: 13px;
+            color: #718096;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-active {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+        
+        .status-inactive {
+            background: rgba(158, 158, 158, 0.1);
+            color: #9E9E9E;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-view {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+        
+        .btn-edit {
+            background: rgba(255, 152, 0, 0.1);
+            color: #FF9800;
+        }
+        
+        .btn-delete {
+            background: rgba(244, 67, 54, 0.1);
+            color: #F44336;
+        }
+        
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #cbd5e0;
+        }
+        
+        .empty-state h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 600px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #718096;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: #f8f9fa;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #4a5568;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+        
+        .loading-row {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading-row td {
+            border: none;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #4a5568;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .page-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .page-info {
+            margin: 0 15px;
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            
+            .page-header h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar (Same as index.html) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-camera-retro"></i>
+                <h1>StudioPro</h1>
+                <p>Management System</p>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="clients.html" class="nav-item active">
+                    <i class="fas fa-users"></i>
+                    <span>Clients</span>
+                </a>
+                <a href="sessions.html" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Sessions</span>
+                </a>
+                <a href="invoices.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Invoices</span>
+                </a>
+                <a href="staff.html" class="nav-item">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Staff</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-info">
+                    <h4>Studio Manager</h4>
+                    <p>Administrator</p>
+                </div>
+                <button class="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2><i class="fas fa-users"></i> Client Management</h2>
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search clients...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddClientModal()">
+                        <i class="fas fa-user-plus"></i> Add New Client
+                    </button>
+                </div>
+            </div>
+
+            <!-- Clients Table -->
+            <div class="clients-container">
+                <div class="table-container">
+                    <table class="clients-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Contact</th>
+                                <th>Lead Source</th>
+                                <th>Manager</th>
+                                <th>Last Session</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTableBody">
+                            <!-- Data will be loaded here -->
+                            <tr class="loading-row">
+                                <td colspan="7">
+                                    <div class="spinner"></div>
+                                    <p>Loading clients...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn" onclick="changePage(-1)" disabled id="prevBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="page-info" id="pageInfo">Page 1 of 1</span>
+                    <button class="page-btn" onclick="changePage(1)" disabled id="nextBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Client Modal -->
+    <div id="clientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-edit"></i> <span id="modalTitle">Add New Client</span></h3>
+                <button class="modal-close" onclick="closeClientModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="clientForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="street">Street Address</label>
+                        <input type="text" id="street">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state" maxlength="2" placeholder="e.g., NY">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="zip">ZIP Code</label>
+                            <input type="text" id="zip">
+                        </div>
+                        <div class="form-group">
+                            <label for="leadSource">Lead Source</label>
+                            <select id="leadSource">
+                                <option value="">Select Source</option>
+                                <option value="Instagram">Instagram</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="Google">Google</option>
+                                <option value="Referral">Referral</option>
+                                <option value="Walk-in">Walk-in</option>
+                                <option value="Website">Website</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="manager">Assigned Manager *</label>
+                        <select id="manager" required>
+                            <option value="">Select Manager</option>
+                            <!-- Staff will be loaded here -->
+                        </select>
+                    </div>
+                    
+                    <input type="hidden" id="clientId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeClientModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveClient()">
+                    <i class="fas fa-save"></i> Save Client
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Details Modal -->
+    <div id="clientDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-circle"></i> Client Details</h3>
+                <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="clientDetailsContent">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeDetailsModal()">Close</button>
+                <button class="btn btn-primary" onclick="editClientFromDetails()">
+                    <i class="fas fa-edit"></i> Edit Client
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="js/clients.js"></script>
+</body>
+</html>
